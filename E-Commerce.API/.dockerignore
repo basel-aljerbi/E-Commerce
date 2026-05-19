@@ -1,0 +1,5 @@
+bin/
+obj/
+ECommerce.db
+*.log
+.DS_Store

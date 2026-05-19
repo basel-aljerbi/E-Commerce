@@ -1,0 +1,74 @@
+services:
+  caddy:
+    image: caddy:alpine
+    container_name: ecommerce-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - ecommerce-network
+
+  frontend:
+    image: ${IMAGE_REGISTRY}/ecommerce-frontend:${IMAGE_TAG:-latest}
+    container_name: ecommerce-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - ecommerce-network
+
+  backend:
+    image: ${IMAGE_REGISTRY}/ecommerce-backend:${IMAGE_TAG:-latest}
+    container_name: ecommerce-backend
+    restart: unless-stopped
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    env_file:
+      - .env.production
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
+    volumes:
+      - uploads-data:/app/wwwroot/images
+    networks:
+      - ecommerce-network
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: ecommerce-db
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_PID=Express
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    healthcheck:
+      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "${SA_PASSWORD}" -C -Q "SELECT 1" || exit 1
+      interval: 15s
+      timeout: 10s
+      retries: 15
+      start_period: 60s
+    networks:
+      - ecommerce-network
+
+volumes:
+  sqlserver-data:
+  uploads-data:
+  caddy-data:
+  caddy-config:
+
+networks:
+  ecommerce-network:
+    driver: bridge

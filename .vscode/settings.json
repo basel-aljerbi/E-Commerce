@@ -1,0 +1,6 @@
+{
+    "dotnet.defaultSolution": "E-Commerce.slnx",
+    "dataworkspace.excludedProjects": [
+        "ECommerce/ECommerce.sqlproj"
+    ]
+}

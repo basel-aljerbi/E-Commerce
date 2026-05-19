@@ -1,0 +1,68 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: ecommerce-db
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${SA_PASSWORD:-YourStrong@Passw0rd}
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    healthcheck:
+      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "${SA_PASSWORD:-YourStrong@Passw0rd}" -C -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./E-Commerce.API
+      dockerfile: Dockerfile
+    container_name: ecommerce-backend
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__ECommerce=${CONNECTIONSTRINGS__ECOMMERCE:-Server=sqlserver,1433;Database=ECommerce;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=true;Encrypt=false;}
+      - Jwt__Key=${JWT__KEY:?JWT__KEY is required}
+      - Jwt__Issuer=${JWT__ISSUER:-ECommerceApi}
+      - Jwt__Audience=${JWT__AUDIENCE:-ECommerceClient}
+      - Jwt__AccessTokenExpirationMinutes=${JWT__ACCESSTOKENEXPIRATIONMINUTES:-15}
+      - Jwt__RefreshTokenExpirationDays=${JWT__REFRESHTOKENEXPIRATIONDAYS:-7}
+      - Stripe__SecretKey=${STRIPE__SECRETKEY:?STRIPE__SECRETKEY is required}
+      - Stripe__PublishableKey=${STRIPE__PUBLISHABLEKEY:?STRIPE__PUBLISHABLEKEY is required}
+      - Stripe__WebhookSecret=${STRIPE__WEBHOOKSECRET:-whsec_placeholder}
+      - SendGrid__ApiKey=${SENDGRID__APIKEY:-SG.placeholder}
+      - SendGrid__FromEmail=${SENDGRID__FROMEMAIL:-noreply@example.com}
+      - SendGrid__FromName=${SENDGRID__FROMNAME:-BMJ Store}
+      - Cors__AllowedOrigins__0=${CORS_ORIGIN:-http://localhost:80}
+      - FrontendUrl=${FRONTEND_URL:-http://localhost:80}
+      - Seq__Url=${SEQ_URL:-}
+    ports:
+      - "8080:8080"
+    volumes:
+      - uploads-data:/app/wwwroot/images
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8080}
+    container_name: ecommerce-frontend
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    restart: unless-stopped
+
+volumes:
+  sqlserver-data:
+  uploads-data:

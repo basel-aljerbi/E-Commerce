@@ -1,0 +1,14 @@
+# Replace with your actual domain
+# shop.example.com and api.shop.example.com
+# Caddy auto-provisions Let's Encrypt SSL certificates
+
+shop.example.com {
+    reverse_proxy frontend:80
+}
+
+api.shop.example.com {
+    reverse_proxy backend:8080
+
+    # Stripe webhooks need larger body size
+    request_body max_size 50MB
+}

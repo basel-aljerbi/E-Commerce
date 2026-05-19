@@ -1,0 +1,71 @@
+GET http://localhost:5042/products/1
+
+###
+GET http://localhost:5042/products/2
+
+###
+POST http://localhost:5042/products
+Content-Type: application/json
+
+{
+    "name": "Cotton T-Shirt",
+    "description": "90% organic cotton",
+    "price": 19.99,
+    "stockQuantity": 70,
+    "imageUrl": null,
+    "categoryId": 1
+}
+
+### 
+PUT http://localhost:5042/products/3
+Content-Type: application/json
+
+{
+    "name": "Cotton Shirt",
+    "description": "90% organic cotton",
+    "price": 19.99,
+    "stockQuantity": 70,
+    "imageUrl": null,
+    "categoryId": 2
+}
+
+### 
+DELETE http://localhost:5042/products/4
+
+###
+GET http://localhost:5042/cart
+
+###
+POST http://localhost:5042/cart
+Content-Type: application/json
+
+{
+    "productId": 1,
+    "quantity": 7
+}
+
+###
+PUT http://localhost:5042/cart/1
+Content-Type: application/json
+
+1
+
+###
+DELETE http://localhost:5042/cart/1
+
+
+###
+DELETE http://localhost:5042/cart
+
+
+###
+GET http://localhost:5042/orders
+
+###
+GET http://localhost:5042/orders/1
+
+###
+POST http://localhost:5042/orders/checkout
+
+###
+PUT http://localhost:5042/orders/1/cancel
