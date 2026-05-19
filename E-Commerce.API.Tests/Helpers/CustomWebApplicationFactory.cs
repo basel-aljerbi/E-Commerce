@@ -35,10 +35,10 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
         builder.UseSetting("Jwt:Issuer", "TestIssuer");
         builder.UseSetting("Jwt:Audience", "TestAudience");
         builder.UseSetting("Jwt:AccessTokenExpirationMinutes", "60");
-        builder.UseSetting("Stripe:SecretKey", "sk_test_XXXXXXXXXXXXXXXXXXXXXXXX");
-        builder.UseSetting("Stripe:PublishableKey", "pk_test_XXXXXXXXXXXXXXXXXXXXXXXX");
-        builder.UseSetting("Stripe:WebhookSecret", "whsec_XXXXXXXXXXXXXXXXXXXXXXXX");
-        builder.UseSetting("SendGrid:ApiKey", "SG.XXXXXXXXXXXXXXXXXXXXXXXX");
+        builder.UseSetting("Stripe:SecretKey", "SK.placeholder");
+        builder.UseSetting("Stripe:PublishableKey", "PK.placeholder");
+        builder.UseSetting("Stripe:WebhookSecret", "WH.placeholder");
+        builder.UseSetting("SendGrid:ApiKey", "SG.placeholder");
         builder.UseSetting("SendGrid:FromEmail", "test@example.com");
         builder.UseSetting("SendGrid:FromName", "Test");
         builder.UseSetting("Cors:AllowedOrigins:0", "http://localhost:3000");
