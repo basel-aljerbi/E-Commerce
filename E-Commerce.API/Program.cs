@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.HttpOverrides;
 using Serilog;
 using Stripe;
 using System.Text;
@@ -274,6 +275,7 @@ try
     // Middleware Pipeline
     // ============================================================
     app.UseCorrelation();
+    app.UseForwardedHeaders();
     app.UseRequestLogging();
     if (!isTestEnv) app.UseSerilogRequestLogging();
 
