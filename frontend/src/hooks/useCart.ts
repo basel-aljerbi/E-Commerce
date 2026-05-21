@@ -3,6 +3,8 @@ import { cartApi } from '@/api/cart';
 import { useAuthStore } from '@/store/auth';
 import { useCartStore } from '@/store/cart';
 import type { AddToCartDto, UpdateCartItemDto } from '@/types/cart';
+import { AxiosError } from 'axios';
+import type { ApiResponse } from '@/types';
 import { toast } from 'sonner';
 
 export function useCart() {
@@ -21,6 +23,14 @@ export function useCart() {
   });
 }
 
+function getErrorMessage(error: unknown): string {
+  if (error instanceof AxiosError) {
+    const apiMsg = (error.response?.data as ApiResponse)?.message;
+    if (apiMsg) return apiMsg;
+  }
+  return '';
+}
+
 export function useAddToCart() {
   const qc = useQueryClient();
   const userId = useAuthStore((s) => s.user?.id);
@@ -31,8 +41,8 @@ export function useAddToCart() {
       toast.success('Added to cart');
     },
     onError: (error) => {
-      console.error('Failed to add to cart:', error);
-      toast.error('Failed to add to cart');
+      const msg = getErrorMessage(error) || 'Failed to add to cart';
+      toast.error(msg);
     },
   });
 }
@@ -44,7 +54,10 @@ export function useUpdateCartItem() {
     mutationFn: ({ id, dto }: { id: number; dto: UpdateCartItemDto }) =>
       cartApi.update(id, dto),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['cart', userId] }),
-    onError: (error) => console.error('Failed to update cart item:', error),
+    onError: (error) => {
+      const msg = getErrorMessage(error) || 'Failed to update cart';
+      toast.error(msg);
+    },
   });
 }
 
@@ -58,8 +71,8 @@ export function useRemoveCartItem() {
       toast.success('Item removed from cart');
     },
     onError: (error) => {
-      console.error('Failed to remove cart item:', error);
-      toast.error('Failed to remove item from cart');
+      const msg = getErrorMessage(error) || 'Failed to remove item';
+      toast.error(msg);
     },
   });
 }
@@ -74,8 +87,8 @@ export function useClearCart() {
       toast.success('Cart cleared');
     },
     onError: (error) => {
-      console.error('Failed to clear cart:', error);
-      toast.error('Failed to clear cart');
+      const msg = getErrorMessage(error) || 'Failed to clear cart';
+      toast.error(msg);
     },
   });
 }

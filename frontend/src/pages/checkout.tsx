@@ -8,13 +8,16 @@ import {
   useElements,
 } from '@stripe/react-stripe-js';
 import { motion } from 'framer-motion';
-import { ArrowLeft, CreditCard, Lock, Shield, Truck } from 'lucide-react';
+import { ArrowLeft, CreditCard, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { formatPrice, getImageUrl } from '@/lib/utils';
 import { useCartStore } from '@/store/cart';
 import { useCheckout } from '@/hooks/useOrders';
+import { useCart } from '@/hooks/useCart';
 import { paymentsApi } from '@/api/payments';
+import { AxiosError } from 'axios';
+import type { ApiResponse } from '@/types';
 import { toast } from 'sonner';
 
 const stripePromise = loadStripe(
@@ -112,6 +115,7 @@ export default function CheckoutPage() {
   const navigate = useNavigate();
   const { items, totalAmount, itemCount } = useCartStore();
   const checkout = useCheckout();
+  useCart();
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [orderId, setOrderId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -139,10 +143,15 @@ export default function CheckoutPage() {
         setClientSecret(paymentResult.data.clientSecret);
         setOrderId(oid);
       } else {
-        toast.error('Failed to initialize payment');
+        const msg = paymentResult.message || 'Failed to initialize payment';
+        toast.error(msg);
       }
     } catch (err) {
-      toast.error('Checkout failed. Please try again.');
+      const msg =
+        (err instanceof AxiosError &&
+          (err.response?.data as ApiResponse)?.message) ||
+        'Checkout failed. Please try again.';
+      toast.error(msg);
     } finally {
       setIsLoading(false);
     }

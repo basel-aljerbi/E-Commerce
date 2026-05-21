@@ -1,6 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ordersApi } from '@/api/orders';
+import { useAuthStore } from '@/store/auth';
 import { toast } from 'sonner';
+import { AxiosError } from 'axios';
+import type { ApiResponse } from '@/types';
 
 export function useOrders() {
   return useQuery({
@@ -19,13 +22,20 @@ export function useOrder(id: number) {
 
 export function useCheckout() {
   const qc = useQueryClient();
+  const userId = useAuthStore((s) => s.user?.id);
   return useMutation({
     mutationFn: () => ordersApi.checkout(),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['cart'] });
+      qc.invalidateQueries({ queryKey: ['cart', userId] });
       qc.invalidateQueries({ queryKey: ['orders'] });
     },
-    onError: (error: Error) => toast.error(error.message || 'Checkout failed'),
+    onError: (error) => {
+      const msg =
+        (error instanceof AxiosError &&
+          (error.response?.data as ApiResponse)?.message) ||
+        'Checkout failed';
+      toast.error(msg);
+    },
   });
 }
 
@@ -37,6 +47,12 @@ export function useCancelOrder() {
       qc.invalidateQueries({ queryKey: ['orders'] });
       toast.success('Order cancelled');
     },
-    onError: () => toast.error('Failed to cancel order'),
+    onError: (error) => {
+      const msg =
+        (error instanceof AxiosError &&
+          (error.response?.data as ApiResponse)?.message) ||
+        'Failed to cancel order';
+      toast.error(msg);
+    },
   });
 }

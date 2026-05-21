@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { wishlistApi } from '@/api/wishlist';
 import { useAuthStore } from '@/store/auth';
+import { AxiosError } from 'axios';
+import type { ApiResponse } from '@/types';
 import { toast } from 'sonner';
 
 export function useWishlist() {
@@ -22,8 +24,11 @@ export function useAddToWishlist() {
       toast.success('Added to wishlist');
     },
     onError: (error) => {
-      console.error('Failed to add to wishlist:', error);
-      toast.error('Failed to add to wishlist');
+      const msg =
+        (error instanceof AxiosError &&
+          (error.response?.data as ApiResponse)?.message) ||
+        'Failed to add to wishlist';
+      toast.error(msg);
     },
   });
 }
@@ -38,8 +43,11 @@ export function useRemoveFromWishlist() {
       toast.success('Removed from wishlist');
     },
     onError: (error) => {
-      console.error('Failed to remove from wishlist:', error);
-      toast.error('Failed to remove from wishlist');
+      const msg =
+        (error instanceof AxiosError &&
+          (error.response?.data as ApiResponse)?.message) ||
+        'Failed to remove from wishlist';
+      toast.error(msg);
     },
   });
 }
