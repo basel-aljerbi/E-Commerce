@@ -11,7 +11,7 @@ export const wishlistApi = {
   },
 
   async add(productId: number) {
-    const { data } = await apiClient.post<ApiResponse<{ id: number }>>(
+    const { data } = await apiClient.post<ApiResponse<number>>(
       `/wishlist/${productId}`
     );
     return data;

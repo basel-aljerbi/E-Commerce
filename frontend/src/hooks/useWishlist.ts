@@ -14,24 +14,32 @@ export function useWishlist() {
 
 export function useAddToWishlist() {
   const qc = useQueryClient();
+  const userId = useAuthStore((s) => s.user?.id);
   return useMutation({
     mutationFn: (productId: number) => wishlistApi.add(productId),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['wishlist'] });
+      qc.invalidateQueries({ queryKey: ['wishlist', userId] });
       toast.success('Added to wishlist');
     },
-    onError: () => toast.error('Failed to add to wishlist'),
+    onError: (error) => {
+      console.error('Failed to add to wishlist:', error);
+      toast.error('Failed to add to wishlist');
+    },
   });
 }
 
 export function useRemoveFromWishlist() {
   const qc = useQueryClient();
+  const userId = useAuthStore((s) => s.user?.id);
   return useMutation({
     mutationFn: (productId: number) => wishlistApi.remove(productId),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['wishlist'] });
+      qc.invalidateQueries({ queryKey: ['wishlist', userId] });
       toast.success('Removed from wishlist');
     },
-    onError: () => toast.error('Failed to remove from wishlist'),
+    onError: (error) => {
+      console.error('Failed to remove from wishlist:', error);
+      toast.error('Failed to remove from wishlist');
+    },
   });
 }
