@@ -66,6 +66,14 @@ export const useAuthStore = create<AuthState>()(
         isAuthenticated: state.isAuthenticated,
         isAdmin: state.isAdmin,
       }),
+      onRehydrateStorage: () => (state, error) => {
+        if (!error && state?.token && state?.user?.id === 0) {
+          const decoded = jwtDecode(state.token, state.user.email, state.user.role);
+          if (decoded && decoded.id > 0) {
+            useAuthStore.setState({ user: decoded as User });
+          }
+        }
+      },
     }
   )
 );
