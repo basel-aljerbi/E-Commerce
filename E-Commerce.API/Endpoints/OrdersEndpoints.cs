@@ -121,8 +121,8 @@ public static class OrdersEndpoints
             var userId = user.GetUserId();
             if (userId is null) return Results.Unauthorized();
 
-            var maxRetries = 3;
-            for (var attempt = 1; attempt <= maxRetries; attempt++)
+            var strategy = dbContext.Database.CreateExecutionStrategy();
+            return await strategy.ExecuteAsync(async () =>
             {
                 await using var transaction = await dbContext.Database.BeginTransactionAsync(ct);
 
@@ -210,20 +210,12 @@ public static class OrdersEndpoints
                         TotalAmount = order.TotalAmount
                     });
                 }
-                catch (DbUpdateConcurrencyException) when (attempt < maxRetries)
-                {
-                    await transaction.RollbackAsync(ct);
-                    await Task.Delay(TimeSpan.FromMilliseconds(100 * attempt), ct);
-                    continue;
-                }
                 catch
                 {
                     await transaction.RollbackAsync(ct);
                     throw;
                 }
-            }
-
-            return ApiResult.BadRequest("Checkout failed due to concurrent activity. Please try again.");
+            });
 
         });
 
