@@ -14,8 +14,10 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { formatPrice, getImageUrl } from '@/lib/utils';
 import { useCartStore } from '@/store/cart';
+import { useCart } from '@/hooks/useCart';
 
 export default function CartPage() {
+  useCart();
   const { items, updateQuantity, removeItem, totalAmount, itemCount } =
     useCartStore();
 

@@ -1,12 +1,23 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { cartApi } from '@/api/cart';
+import { useAuthStore } from '@/store/auth';
+import { useCartStore } from '@/store/cart';
 import type { AddToCartDto, UpdateCartItemDto } from '@/types/cart';
 import { toast } from 'sonner';
 
 export function useCart() {
+  const userId = useAuthStore((s) => s.user?.id);
+  const syncFromServer = useCartStore((s) => s.syncFromServer);
   return useQuery({
-    queryKey: ['cart'],
-    queryFn: () => cartApi.get(),
+    queryKey: ['cart', userId],
+    queryFn: async () => {
+      const result = await cartApi.get();
+      if (result.success && result.data) {
+        syncFromServer(result.data.items);
+      }
+      return result;
+    },
+    enabled: !!userId,
   });
 }
 

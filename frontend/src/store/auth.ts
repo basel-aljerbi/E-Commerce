@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { AuthResponseDto, User } from '@/types/auth';
 import { jwtDecode } from '@/utils/jwt';
+import { useCartStore } from '@/store/cart';
 
 interface AuthState {
   token: string | null;
@@ -24,28 +25,29 @@ export const useAuthStore = create<AuthState>()(
       isAdmin: false,
 
       setAuth: (response: AuthResponseDto) => {
-        const user = jwtDecode(response.token, response.email, response.role);
+        const decoded = jwtDecode(response.token, response.email, response.role);
         set({
           token: response.token,
           refreshToken: response.refreshToken,
-          user,
+          user: decoded as User | null,
           isAuthenticated: true,
           isAdmin: response.role === 'Admin',
         });
       },
 
       setTokens: (token: string, refreshToken: string) => {
-        const user = jwtDecode(token);
+        const decoded = jwtDecode(token);
         set({
           token,
           refreshToken,
-          user,
+          user: decoded as User | null,
           isAuthenticated: true,
-          isAdmin: user?.role === 'Admin' ?? false,
+          isAdmin: decoded?.role === 'Admin',
         });
       },
 
       logout: () => {
+        useCartStore.getState().clearCart();
         set({
           token: null,
           refreshToken: null,

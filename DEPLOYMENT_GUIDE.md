@@ -172,12 +172,12 @@ Jwt__Key=REPLACE_WITH_64_CHAR_HEX_STRING
 
 # === STRIPE ===
 # Get from https://dashboard.stripe.com/test/apikeys (test) or live dashboard
-Stripe__SecretKey=sk_live_xxxxxxxxxxxxxxxxxxxx
-Stripe__PublishableKey=pk_live_xxxxxxxxxxxxxxxxxxxx
-Stripe__WebhookSecret=whsec_xxxxxxxxxxxxxxxxxxxx
+Stripe__SecretKey=stripe_secret_key_live_placeholder
+Stripe__PublishableKey=stripe_publishable_key_live_placeholder
+Stripe__WebhookSecret=stripe_webhook_secret_placeholder
 
 # === SENDGRID ===
-SendGrid__ApiKey=SG.xxxxxxxxxxxxxxxxxxxx
+SendGrid__ApiKey=sendgrid_api_key_placeholder
 SendGrid__FromEmail=noreply@yourdomain.com
 SendGrid__FromName=Your Store Name
 
@@ -186,7 +186,7 @@ Cors__AllowedOrigins__0=https://shop.example.com
 FrontendUrl=https://shop.example.com
 
 # === FRONTEND API URL ===
-VITE_STRIPE_PUBLISHABLE_KEY=pk_live_xxxxxxxxxxxxxxxxxxxx
+VITE_STRIPE_PUBLISHABLE_KEY=stripe_publishable_key_live_placeholder
 ```
 
 > **Important:** The `Jwt__Key` must be at least 32 characters (256 bits). The same key is used to sign ALL tokens — changing it invalidates existing tokens.
@@ -330,7 +330,7 @@ docker compose up -d backend
    - `payment_intent.succeeded`
    - `payment_intent.payment_failed`
 5. Click **Add endpoint**
-6. Copy the **Signing secret** (`whsec_...`)
+6. Copy the **Signing secret** from the Stripe dashboard
 
 ### Add the signing secret to env
 
@@ -340,7 +340,7 @@ cd /opt/ecommerce
 nano .env.production
 
 # Update this line:
-Stripe__WebhookSecret=whsec_YOUR_COPIED_SECRET
+Stripe__WebhookSecret=YOUR_COPIED_STRIPE_WEBHOOK_SECRET
 
 # Restart backend to pick up the change
 docker compose up -d backend
@@ -368,7 +368,7 @@ docker compose logs --tail=20 backend
 1. Go to [SendGrid](https://app.sendgrid.com) → Settings → API Keys
 2. Click **Create API Key**
 3. Choose **Full Access** or **Restricted Access** with Mail Send permission
-4. Copy the API key (starts with `SG.`)
+4. Copy the API key from the SendGrid dashboard
 
 ### Update the env file
 
@@ -378,7 +378,7 @@ cd /opt/ecommerce
 nano .env.production
 
 # Update these lines:
-SendGrid__ApiKey=SG.YOUR_ACTUAL_SENDGRID_KEY
+SendGrid__ApiKey=YOUR_SENDGRID_API_KEY
 SendGrid__FromEmail=noreply@yourdomain.com
 SendGrid__FromName=Your Store Name
 
@@ -657,7 +657,7 @@ docker run --rm -v uploads-data:/source -v /backup/ecommerce:/backup alpine \
 
 ### 6. SendGrid Placeholder Fails Silently
 
-If `SendGrid__ApiKey` is `SG.placeholder`, email sending fails with 401 Unauthorized. This is logged as a warning but does NOT crash the app. Registration verification and password reset emails will not be delivered until a valid API key is configured.
+If `SendGrid__ApiKey` is `sendgrid_placeholder`, email sending fails with 401 Unauthorized. This is logged as a warning but does NOT crash the app. Registration verification and password reset emails will not be delivered until a valid API key is configured.
 
 ### 7. Stripe Webhook Requires Public URL
 

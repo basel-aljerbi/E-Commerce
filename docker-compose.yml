@@ -37,8 +37,8 @@ services:
       - Jwt__RefreshTokenExpirationDays=${JWT__REFRESHTOKENEXPIRATIONDAYS:-7}
       - Stripe__SecretKey=${STRIPE__SECRETKEY:?STRIPE__SECRETKEY is required}
       - Stripe__PublishableKey=${STRIPE__PUBLISHABLEKEY:?STRIPE__PUBLISHABLEKEY is required}
-      - Stripe__WebhookSecret=${STRIPE__WEBHOOKSECRET:-whsec_placeholder}
-      - SendGrid__ApiKey=${SENDGRID__APIKEY:-SG.placeholder}
+      - Stripe__WebhookSecret=${STRIPE__WEBHOOKSECRET:-stripe_webhook_placeholder}
+      - SendGrid__ApiKey=${SENDGRID__APIKEY:-sendgrid_placeholder}
       - SendGrid__FromEmail=${SENDGRID__FROMEMAIL:-noreply@example.com}
       - SendGrid__FromName=${SENDGRID__FROMNAME:-BMJ Store}
       - Cors__AllowedOrigins__0=${CORS_ORIGIN:-http://localhost:80}

@@ -38,7 +38,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
         builder.UseSetting("Stripe:SecretKey", "SK.placeholder");
         builder.UseSetting("Stripe:PublishableKey", "PK.placeholder");
         builder.UseSetting("Stripe:WebhookSecret", "WH.placeholder");
-        builder.UseSetting("SendGrid:ApiKey", "SG.placeholder");
+        builder.UseSetting("SendGrid:ApiKey", "sendgrid-placeholder");
         builder.UseSetting("SendGrid:FromEmail", "test@example.com");
         builder.UseSetting("SendGrid:FromName", "Test");
         builder.UseSetting("Cors:AllowedOrigins:0", "http://localhost:3000");

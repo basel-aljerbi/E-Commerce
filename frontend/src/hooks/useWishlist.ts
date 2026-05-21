@@ -1,11 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { wishlistApi } from '@/api/wishlist';
+import { useAuthStore } from '@/store/auth';
 import { toast } from 'sonner';
 
 export function useWishlist() {
+  const userId = useAuthStore((s) => s.user?.id);
   return useQuery({
-    queryKey: ['wishlist'],
+    queryKey: ['wishlist', userId],
     queryFn: () => wishlistApi.get(),
+    enabled: !!userId,
   });
 }
 

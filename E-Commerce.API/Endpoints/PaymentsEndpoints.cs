@@ -1,11 +1,11 @@
 using System.Security.Claims;
 using E_Commerce.API.Data;
 using E_Commerce.API.Dtos;
+using E_Commerce.API.Extensions;
 using E_Commerce.API.Infrastructure;
 using E_Commerce.API.Models;
 using E_Commerce.API.Models.Enums;
 using E_Commerce.API.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Stripe;
 
@@ -22,11 +22,11 @@ public static class PaymentsEndpoints
             PaymentRequestDto dto,
             ECommerceContext dbContext,
             StripeService stripeService,
-            HttpContext httpContext,
+            ClaimsPrincipal user,
             CancellationToken ct) =>
         {
-            var userId = int.Parse(
-                httpContext.User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var userId = user.GetUserId();
+            if (userId is null) return Results.Unauthorized();
 
             var order = await dbContext.Orders
                 .FirstOrDefaultAsync(o => o.Id == dto.OrderId && o.UserId == userId, ct);
